@@ -31,6 +31,13 @@ class AuthLoginController extends GetxController {
             "Selamat datang di Clean Tracker App",
           );
           Get.offAllNamed(Routes.HOME);
+        }
+        if (authC.user.hasRole(Role.officer)) {
+          Get.snackbar(
+            "Sign In Berhasil",
+            "Selamat datang di Clean Tracker App",
+          );
+          Get.offAllNamed(Routes.OFFICER);
         } else {
           Get.snackbar(
             "Sign In Gagal",

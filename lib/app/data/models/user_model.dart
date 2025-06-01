@@ -100,11 +100,9 @@ class UserModel extends Database {
 abstract class Role {
   static const administrator = 'Administrator';
   static const user = 'User';
-  static const rentalStaff = 'Rental Staff';
-  static const storeStaff = 'Store Staff';
+  static const officer = 'Officer';
   // static const hrd = 'HRD';
   // static const employee = 'Employee';
 
-  static const list = [administrator, user];
-  // static const list = [magang, administrator, mentor, hrd, employee];
+  static const list = [administrator, user, officer];
 }

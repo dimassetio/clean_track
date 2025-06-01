@@ -161,7 +161,7 @@ class AuthController extends GetxController {
     firebaseUser = Rx<User?>(_auth.currentUser);
     firebaseUser.bindStream(_auth.userChanges());
     ever(firebaseUser, (callback) => _streamUser);
-    _streamUser(_auth.currentUser);
+    _streamUser(firebaseUser.value);
   }
 
   @override

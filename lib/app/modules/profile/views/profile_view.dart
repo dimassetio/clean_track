@@ -1,8 +1,10 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:clean_track/app/data/models/user_model.dart';
 import 'package:clean_track/app/helpers/images.dart';
 import 'package:clean_track/app/helpers/themes.dart';
 import 'package:clean_track/app/routes/app_pages.dart';
 import 'package:clean_track/app/widgets/BottomNav.dart';
+import 'package:clean_track/app/widgets/bottom_nav_officer.dart';
 import 'package:clean_track/app/widgets/card_column.dart';
 import 'package:flutter/material.dart';
 
@@ -16,7 +18,12 @@ class ProfileView extends GetView<ProfileController> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      bottomNavigationBar: BottomNav(currentIndex: 2),
+      bottomNavigationBar: Obx(
+        () =>
+            controller.user?.hasRole(Role.officer) ?? false
+                ? BottomNavOfficer(currentIndex: 2)
+                : BottomNav(currentIndex: 2),
+      ),
       body: SafeArea(
         child: Container(
           child: Column(
@@ -54,7 +61,14 @@ class ProfileView extends GetView<ProfileController> {
                       ),
                       IconButton(
                         onPressed: () {
-                          Get.offAllNamed(Routes.HOME);
+                          var isOfficer = controller.user?.hasRole(
+                            Role.officer,
+                          );
+                          if (isOfficer ?? false) {
+                            Get.offAllNamed(Routes.OFFICER);
+                          } else {
+                            Get.offAllNamed(Routes.HOME);
+                          }
                         },
                         icon: Icon(Icons.close),
                       ),
@@ -104,7 +118,9 @@ class ProfileView extends GetView<ProfileController> {
                       ),
                     ),
                     Text(
-                      "Reports Submitted",
+                      controller.isOfficer
+                          ? "Task assigned"
+                          : "Reports Submitted",
                       style: textTheme(
                         context,
                       ).bodyMedium?.copyWith(color: AppColors.textSecondary),

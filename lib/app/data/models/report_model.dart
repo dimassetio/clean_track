@@ -20,7 +20,11 @@ class ReportModel extends Database {
   static const String OFFICER_PROGRESS_PHOTO = "OFFICER_PROGRESS_PHOTO";
   static const String OFFICER_LAST_LOCATION = "OFFICER_LAST_LOCATION";
   static const String OFFICER_NOTE = "OFFICER_NOTE";
+  static const String TASK_DURATION = "TASK_DURATION";
   static const String CREATED_AT = "CREATED_AT";
+  static const String ASSIGNED_AT = "ASSIGNED_AT";
+  static const String STARTED_AT = "STARTED_AT";
+  static const String DONE_AT = "DONE_AT";
   static const String UPDATED_AT = "UPDATED_AT";
 
   String? id;
@@ -36,7 +40,11 @@ class ReportModel extends Database {
   List<String>? officerProgressPhoto;
   GeoPoint? officerLastLocation;
   String? officerNote;
+  int? taskDuration;
   DateTime? createdAt;
+  DateTime? assignedAt;
+  DateTime? startedAt;
+  DateTime? doneAt;
   DateTime? updatedAt;
 
   ReportModel({
@@ -53,7 +61,11 @@ class ReportModel extends Database {
     this.officerProgressPhoto,
     this.officerLastLocation,
     this.officerNote,
+    this.taskDuration,
     this.createdAt,
+    this.assignedAt,
+    this.startedAt,
+    this.doneAt,
     this.updatedAt,
   }) : super(
          collectionReference: firestore.collection(COLLECTION_NAME),
@@ -81,7 +93,11 @@ class ReportModel extends Database {
     );
     officerLastLocation = json?[OFFICER_LAST_LOCATION];
     officerNote = json?[OFFICER_NOTE];
+    taskDuration = json?[TASK_DURATION];
     createdAt = (json?[CREATED_AT] as Timestamp?)?.toDate();
+    assignedAt = (json?[ASSIGNED_AT] as Timestamp?)?.toDate();
+    startedAt = (json?[STARTED_AT] as Timestamp?)?.toDate();
+    doneAt = (json?[DONE_AT] as Timestamp?)?.toDate();
     updatedAt = (json?[UPDATED_AT] as Timestamp?)?.toDate();
   }
 
@@ -100,7 +116,11 @@ class ReportModel extends Database {
       OFFICER_PROGRESS_PHOTO: officerProgressPhoto,
       OFFICER_LAST_LOCATION: officerLastLocation,
       OFFICER_NOTE: officerNote,
+      TASK_DURATION: taskDuration,
       CREATED_AT: createdAt,
+      ASSIGNED_AT: assignedAt,
+      STARTED_AT: startedAt,
+      DONE_AT: doneAt,
       UPDATED_AT: updatedAt,
     };
   }
@@ -116,6 +136,13 @@ class ReportModel extends Database {
       await super.edit(toJson());
     }
     return this;
+  }
+
+  Future<String?> uploadFile(File file, String? child) async {
+    if (id.isEmptyOrNull) {
+      return null;
+    }
+    return await super.upload(id: id!, file: file, child: child);
   }
 
   // static Stream<List<ReportModel>>
@@ -139,4 +166,12 @@ class ReportModel extends Database {
         .snapshots()
         .map((event) => ReportModel.fromSnapshot(event));
   }
+}
+
+class ReportStatus {
+  static const String pending = "Pending";
+  static const String notStarted = "Not Started";
+  static const String processing = "Processing";
+  static const String done = "Done";
+  static const String cancelled = "Cancelled";
 }

@@ -70,13 +70,21 @@ class Database {
     }
   }
 
-  Future<String?> upload({required String id, required File file}) async {
+  Future<String?> upload({
+    required String id,
+    required File file,
+    String? child,
+  }) async {
     try {
       File compressedImage = await compressImage(file);
       print("PATH: ${storageReference?.fullPath}");
-      var task = await storageReference?.child(id).putFile(compressedImage);
+      var ref = storageReference?.child(id);
+      if (child is String) {
+        ref = ref?.child(child);
+      }
+      var task = await ref?.putFile(compressedImage);
       if (task?.state == TaskState.success) {
-        return await storageReference?.child(id).getDownloadURL();
+        return await ref?.getDownloadURL();
       }
 
       Get.defaultDialog(

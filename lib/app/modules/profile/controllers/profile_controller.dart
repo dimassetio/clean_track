@@ -6,6 +6,7 @@ import 'package:get/get.dart';
 class ProfileController extends GetxController {
   Rxn<UserModel> _user = Rxn();
   UserModel? get user => _user.value;
+  bool get isOfficer => user?.hasRole(Role.officer) ?? false;
 
   void signOut() {
     authC.signOut();
@@ -23,13 +24,24 @@ class ProfileController extends GetxController {
         );
   }
 
+  Stream<List<ReportModel>> _officerReport() {
+    return ReportModel().collectionReference
+        .where(ReportModel.OFFICER_ID, isEqualTo: authC.user.id)
+        .snapshots()
+        .map(
+          (stream) =>
+              stream.docs.map((doc) => ReportModel.fromSnapshot(doc)).toList(),
+        );
+  }
+
   final count = 0.obs;
 
   @override
   void onInit() {
     super.onInit();
     _user.value = authC.user;
-    reports.bindStream(_streamReports());
+    var isOfficer = (_user.value?.hasRole(Role.officer) ?? false);
+    reports.bindStream(isOfficer ? _officerReport() : _streamReports());
   }
 
   @override

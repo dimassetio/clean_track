@@ -33,9 +33,21 @@ final ThemeData lightTheme = ThemeData(
   ),
   elevatedButtonTheme: ElevatedButtonThemeData(
     style: ElevatedButton.styleFrom(
-        backgroundColor: AppColors.accentDark,
-        foregroundColor: Colors.white,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16))),
+      backgroundColor: AppColors.accentDark,
+      foregroundColor: Colors.white,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+    ),
+  ),
+  textTheme: TextTheme().copyWith(
+    labelLarge: TextTheme().labelLarge?.copyWith(
+      color: AppColors.textSecondary,
+    ),
+    labelMedium: TextTheme().labelMedium?.copyWith(
+      color: AppColors.textSecondary,
+    ),
+    labelSmall: TextTheme().labelSmall?.copyWith(
+      color: AppColors.textSecondary,
+    ),
   ),
 );
 
@@ -60,6 +72,17 @@ final ThemeData darkTheme = ThemeData(
     style: ElevatedButton.styleFrom(
       backgroundColor: AppColors.primary,
       foregroundColor: Colors.white,
+    ),
+  ),
+  textTheme: TextTheme().copyWith(
+    labelLarge: TextTheme().labelLarge?.copyWith(
+      color: AppColors.textSecondary,
+    ),
+    labelMedium: TextTheme().labelMedium?.copyWith(
+      color: AppColors.textSecondary,
+    ),
+    labelSmall: TextTheme().labelSmall?.copyWith(
+      color: AppColors.textSecondary,
     ),
   ),
 );

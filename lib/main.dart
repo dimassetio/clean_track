@@ -24,7 +24,11 @@ void main() async {
       title: "Clean Track",
       // initialRoute: AppPages.INITIAL,
       initialRoute:
-          (user?.id?.isEmptyOrNull ?? true) ? Routes.AUTH_LOGIN : Routes.HOME,
+          (user?.id?.isEmptyOrNull ?? true)
+              ? Routes.AUTH_LOGIN
+              : user!.hasRole(Role.officer)
+              ? Routes.OFFICER
+              : Routes.HOME,
       getPages: AppPages.routes,
       theme: lightTheme,
       darkTheme: darkTheme,

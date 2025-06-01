@@ -10,6 +10,9 @@ abstract class Routes {
   static const REPORT_HISTORY = _Paths.REPORT_HISTORY;
   static const REPORT_DETAIL = _Paths.REPORT_DETAIL;
   static const REPORT_FORM = _Paths.REPORT_FORM;
+  static const OFFICER = _Paths.OFFICER;
+  static const TASK_DETAIL = _Paths.TASK_DETAIL;
+  static const TASK_HISTORY = _Paths.TASK_HISTORY;
 }
 
 abstract class _Paths {
@@ -21,4 +24,7 @@ abstract class _Paths {
   static const REPORT_HISTORY = '/history';
   static const REPORT_DETAIL = '/detail';
   static const REPORT_FORM = '/form';
+  static const OFFICER = '/officer';
+  static const TASK_DETAIL = '/task/detail';
+  static const TASK_HISTORY = '/task/history';
 }

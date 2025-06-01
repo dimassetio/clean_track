@@ -8,12 +8,16 @@ String dateTimeFormatter(
   DateTime? date, {
   bool useSeparator = false,
   bool useSecond = false,
+  String? format,
   String? def,
 }) {
   if (date is DateTime) {
-    var timeFormat = 'H.m';
+    var timeFormat = 'HH.mm';
     if (useSecond) {
       timeFormat = 'H.m.s';
+    }
+    if (format is String && format != '') {
+      return DateFormat(format).format(date);
     }
     if (useSeparator) {
       return DateFormat('d MMM y | $timeFormat').format(date);
