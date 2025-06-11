@@ -10,6 +10,8 @@ import 'package:clean_track/app/widgets/card_column.dart';
 import 'package:clean_track/app/widgets/circle_container.dart';
 import 'package:clean_track/app/widgets/photo_picker.dart';
 import 'package:clean_track/app/widgets/text_field.dart';
+import 'package:flutter/foundation.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 
 import 'package:get/get.dart';
@@ -74,7 +76,7 @@ class TaskDetailWidget extends StatelessWidget {
               padding: 12,
               children: [
                 AspectRatio(
-                  aspectRatio: 2 / 1,
+                  aspectRatio: 3 / 2,
                   child: Card(
                     margin: EdgeInsets.only(bottom: 16),
                     shape: RoundedRectangleBorder(
@@ -93,6 +95,14 @@ class TaskDetailWidget extends StatelessWidget {
                                   : {},
                           myLocationEnabled: true,
                           myLocationButtonEnabled: true,
+                          mapToolbarEnabled: true,
+
+                          gestureRecognizers:
+                              <Factory<OneSequenceGestureRecognizer>>{
+                                Factory<OneSequenceGestureRecognizer>(
+                                  () => EagerGestureRecognizer(),
+                                ),
+                              },
                         ),
                       ),
                     ),

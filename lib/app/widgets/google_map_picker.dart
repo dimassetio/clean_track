@@ -1,4 +1,8 @@
+import 'package:clean_track/app/helpers/formatter.dart';
 import 'package:clean_track/app/helpers/themes.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/foundation.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
@@ -27,6 +31,14 @@ class GoogleMapPicker extends StatelessWidget {
   RxBool _isActive = true.obs;
   set isActive(value) => this._isActive.value = value;
   get isActive => this._isActive.value;
+
+  RxString _address = ''.obs;
+  String get address => this._address.value;
+  set address(value) => this._address.value = value;
+
+  RxString _area = ''.obs;
+  String get area => this._area.value;
+  set area(value) => this._area.value = value;
 
   Future<void> _initLocation() async {
     try {
@@ -66,6 +78,12 @@ class GoogleMapPicker extends StatelessWidget {
       _mapController.value?.animateCamera(
         CameraUpdate.newCameraPosition(_cameraPosition.value),
       );
+
+      var res = await getAddressAndArea(position: position);
+      if (res.length == 2) {
+        address = res[0];
+        area = res[1];
+      }
     } catch (e) {
       Get.snackbar("Error", e.toString());
     } finally {
@@ -85,6 +103,14 @@ class GoogleMapPicker extends StatelessWidget {
     );
     if (onMarkerChanged != null) {
       onMarkerChanged!(position);
+      getAddressAndArea(
+        geo: GeoPoint(position.latitude, position.longitude),
+      ).then((value) {
+        if (value.length == 2) {
+          address = value[0];
+          area = value[1];
+        }
+      });
     }
   }
 
@@ -93,24 +119,27 @@ class GoogleMapPicker extends StatelessWidget {
     return Obx(
       () => Column(
         children: [
-          if (isActive)
-            ListTile(
-              leading:
-                  isLoading
-                      ? SizedBox(
-                        width: 20,
-                        height: 20,
-                        child: CircularProgressIndicator(),
-                      )
-                      : Icon(
-                        Icons.my_location_rounded,
-                        color: primaryColor(context),
-                      ),
-              title: Text("My Location"),
-              onTap: () async {
-                await _initLocation();
-              },
-            ),
+          ListTile(
+            contentPadding: EdgeInsets.fromLTRB(16, 0, 16, 16),
+            leading:
+                isLoading
+                    ? SizedBox(
+                      width: 20,
+                      height: 20,
+                      child: CircularProgressIndicator(),
+                    )
+                    : Icon(
+                      Icons.my_location_rounded,
+                      color: primaryColor(context),
+                    ),
+            title: Obx(() => Text(address.isEmpty ? "My Location" : address)),
+            onTap:
+                !isActive
+                    ? null
+                    : () async {
+                      await _initLocation();
+                    },
+          ),
           Expanded(
             child: GoogleMap(
               onMapCreated: _onMapCreated,
@@ -119,6 +148,12 @@ class GoogleMapPicker extends StatelessWidget {
               markers: _marker.value != null ? {_marker.value!} : {},
               myLocationEnabled: true,
               myLocationButtonEnabled: true,
+              gestureRecognizers: <Factory<OneSequenceGestureRecognizer>>{
+                if (isActive)
+                  Factory<OneSequenceGestureRecognizer>(
+                    () => EagerGestureRecognizer(),
+                  ),
+              },
             ),
           ),
         ],

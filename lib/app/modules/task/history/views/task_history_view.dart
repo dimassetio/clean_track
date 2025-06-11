@@ -73,7 +73,12 @@ class TaskHistoryView extends GetView<TaskHistoryController> {
                                     itemBuilder: (context, index) {
                                       var report =
                                           controller.userReports[index];
-                                      return OfficerTaskCard(report: report);
+                                      return Padding(
+                                        padding: const EdgeInsets.only(
+                                          bottom: 16,
+                                        ),
+                                        child: OfficerTaskCard(report: report),
+                                      );
                                     },
                                   ),
                         ),

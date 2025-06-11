@@ -1,18 +1,22 @@
 import 'dart:io';
 
 import 'package:clean_track/app/data/models/report_model.dart';
+import 'package:clean_track/app/helpers/formatter.dart';
 import 'package:clean_track/app/modules/auth/controllers/auth_controller.dart';
+import 'package:clean_track/app/modules/report/form/controllers/map_picker_controller.dart';
 import 'package:clean_track/app/routes/app_pages.dart';
 import 'package:clean_track/app/widgets/form_foto.dart';
-import 'package:clean_track/app/widgets/google_map_picker.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
+// import 'package:clean_track/app/widgets/google_map_picker.dart';
+// import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:nb_utils/nb_utils.dart';
+// import 'package:nb_utils/nb_utils.dart';
 
 class ReportFormController extends GetxController {
   //TODO: Implement ReportFormController
+
+  MapPickerController mapPickerController = Get.find<MapPickerController>();
 
   Rxn<Marker> _marker = Rxn();
   Marker? get marker => this._marker.value;
@@ -38,16 +42,18 @@ class ReportFormController extends GetxController {
   ReportModel? get report => this._report.value;
   set report(ReportModel? value) => this._report.value = value;
 
-  FormFoto formFoto = FormFoto();
-  late GoogleMapPicker locationPicker;
+  Rx<FormFoto> _formFoto = FormFoto().obs;
+  FormFoto get formFoto => this._formFoto.value;
+  set formFoto(value) => this._formFoto.value = value;
+  // late GoogleMapPicker locationPicker;
   TextEditingController descC = TextEditingController();
-  TextEditingController latC = TextEditingController();
-  TextEditingController longC = TextEditingController();
+  // TextEditingController latC = TextEditingController();
+  // TextEditingController longC = TextEditingController();
 
-  void onMarkerChanged(LatLng coordinate) {
-    latC.text = coordinate.latitude.toString();
-    longC.text = coordinate.longitude.toString();
-  }
+  // void onMarkerChanged(LatLng coordinate) {
+  //   latC.text = coordinate.latitude.toString();
+  //   longC.text = coordinate.longitude.toString();
+  // }
 
   bool validate() {
     var res = true;
@@ -57,7 +63,7 @@ class ReportFormController extends GetxController {
     } else {
       formFotoMessage = "";
     }
-    if (latC.text.isEmpty || longC.text.isEmpty) {
+    if (mapPickerController.marker.value == null) {
       locationMessage =
           "Please pick location by click button below or tap on map";
       res = false;
@@ -70,7 +76,7 @@ class ReportFormController extends GetxController {
   void setReview(bool value) {
     isReview = value;
     formFoto.showButton = !value;
-    locationPicker.isActive = !value;
+    mapPickerController.isActive = !value;
   }
 
   Future save() async {
@@ -81,9 +87,14 @@ class ReportFormController extends GetxController {
         status: 'Pending',
         reporterId: authC.user.id ?? report?.reporterId ?? '',
         reporterName: authC.user.name ?? report?.reporterName ?? '',
-        reporterLocation: GeoPoint(latC.text.toDouble(), longC.text.toDouble()),
+        // reporterLocation: GeoPoint(latC.text.toDouble(), longC.text.toDouble()),
+        reporterLocation: geoFromLatLng(
+          mapPickerController.marker.value!.position,
+        ),
         reporterDescription: descC.text,
         reporterPhoto: report?.reporterPhoto ?? '',
+        address: mapPickerController.address,
+        area: mapPickerController.area,
         createdAt: report?.createdAt ?? DateTime.now(),
         updatedAt: DateTime.now(),
       );
@@ -108,7 +119,6 @@ class ReportFormController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    locationPicker = GoogleMapPicker(onMarkerChanged: onMarkerChanged);
   }
 
   @override

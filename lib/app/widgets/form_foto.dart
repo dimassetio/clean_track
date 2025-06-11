@@ -61,7 +61,9 @@ Future<XFile?> imagePickerBottomSheet(BuildContext context) async {
 class FormFoto extends StatelessWidget {
   String oldPath = '';
   String defaultPath;
-  bool showButton = true;
+  RxBool _showButton = true.obs;
+  bool get showButton => this._showButton.value;
+  set showButton(bool value) => this._showButton.value = value;
   bool showFrame;
   bool forceCamera;
   double? height;
@@ -69,7 +71,6 @@ class FormFoto extends StatelessWidget {
   FormFoto({
     this.oldPath = '',
     this.defaultPath = png_logo,
-    this.showButton = true,
     this.showFrame = false,
     this.forceCamera = false,
     this.height,
@@ -118,24 +119,28 @@ class FormFoto extends StatelessWidget {
             ),
           ),
         ),
-        if (showButton)
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(24),
-              ),
-            ),
-            child: Text("Upload Foto"),
-            onPressed: () async {
-              var res =
-                  forceCamera
-                      ? await getImage(ImageSource.camera)
-                      : await imagePickerBottomSheet(context);
-              if (res is XFile) {
-                xfoto.value = res.path;
-              }
-            },
-          ),
+        Obx(
+          () =>
+              showButton
+                  ? ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(24),
+                      ),
+                    ),
+                    child: Text("Upload Foto"),
+                    onPressed: () async {
+                      var res =
+                          forceCamera
+                              ? await getImage(ImageSource.camera)
+                              : await imagePickerBottomSheet(context);
+                      if (res is XFile) {
+                        xfoto.value = res.path;
+                      }
+                    },
+                  )
+                  : SizedBox(),
+        ),
       ],
     );
   }

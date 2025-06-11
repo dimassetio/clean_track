@@ -162,11 +162,11 @@ class ReportCard extends StatelessWidget {
   Widget statusIcon() {
     switch (report.status) {
       case "Processing":
-        return Icon(Icons.hourglass_empty);
+        return Icon(Icons.hourglass_empty, size: 18);
       case "Done":
-        return Icon(Icons.check);
+        return Icon(Icons.check, size: 18);
       default:
-        return Icon(Icons.close);
+        return Icon(Icons.close, size: 18);
     }
   }
 
@@ -213,7 +213,7 @@ class ReportCard extends StatelessWidget {
                   children: [
                     CircleContainer(
                       color: statusColor(),
-                      padding: EdgeInsets.symmetric(horizontal: 8),
+                      padding: EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                       child: Wrap(
                         alignment: WrapAlignment.center,
                         crossAxisAlignment: WrapCrossAlignment.center,

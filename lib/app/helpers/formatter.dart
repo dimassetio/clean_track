@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/services.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:intl/intl.dart';
 
 String dateTimeFormatter(
@@ -81,6 +82,10 @@ int currencyDeformatter(String value) {
   return int.parse(value.replaceAll('Rp', '').replaceAll('.', ''));
 }
 
+GeoPoint geoFromLatLng(LatLng value) {
+  return GeoPoint(value.latitude, value.longitude);
+}
+
 GeoPoint posToGeo(Position pos) {
   return GeoPoint(pos.latitude, pos.longitude);
 }
@@ -112,11 +117,36 @@ Future<String> getAddress({GeoPoint? geo, Position? position}) async {
     );
     if (places.isNotEmpty) {
       var place = places.first;
-      return "${place.name}, ${place.street}, ${place.subLocality}, ${place.locality}";
+      return "${place.name}, ${place.street}, ${place.subLocality}, ${place.locality}, ${place.subAdministrativeArea}";
     }
     return '';
   }
   return '';
+}
+
+Future<List<String>> getAddressAndArea({
+  GeoPoint? geo,
+  Position? position,
+}) async {
+  var value = position;
+  if (geo is GeoPoint) {
+    value = geoToPost(geo);
+  }
+  if (value is Position) {
+    var places = await placemarkFromCoordinates(
+      value.latitude,
+      value.longitude,
+    );
+    if (places.isNotEmpty) {
+      var place = places.first;
+      return [
+        "${place.name}, ${place.street}, ${place.subLocality}, ${place.locality}, ${place.subAdministrativeArea}",
+        (place.subLocality ?? ''),
+      ];
+    }
+    return [''];
+  }
+  return [''];
 }
 
 class CurrrencyInputFormatter extends TextInputFormatter {

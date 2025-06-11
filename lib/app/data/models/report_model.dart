@@ -9,9 +9,12 @@ class ReportModel extends Database {
 
   static const String ID = "ID";
   static const String STATUS = "STATUS";
+  static const String REPORT_ID = "REPORT_ID";
   static const String REPORTER_ID = "REPORTER_ID";
   static const String REPORTER_NAME = "REPORTER_NAME";
   static const String REPORTER_LOCATION = "REPORTER_LOCATION";
+  static const String AREA = "AREA";
+  static const String ADDRESS = "ADDRESS";
   static const String OFFICER_ID = "OFFICER_ID";
   static const String OFFICER_NAME = "OFFICER_NAME";
   static const String REPORTER_DESCRIPTION = "REPORTER_DESCRIPTION";
@@ -19,6 +22,7 @@ class ReportModel extends Database {
   static const String OFFICER_BEFORE_PHOTO = "OFFICER_BEFORE_PHOTO";
   static const String OFFICER_PROGRESS_PHOTO = "OFFICER_PROGRESS_PHOTO";
   static const String OFFICER_LAST_LOCATION = "OFFICER_LAST_LOCATION";
+  static const String OFFICER_LAST_LOCATION_AT = "OFFICER_LAST_LOCATION_AT";
   static const String OFFICER_NOTE = "OFFICER_NOTE";
   static const String TASK_DURATION = "TASK_DURATION";
   static const String CREATED_AT = "CREATED_AT";
@@ -29,9 +33,12 @@ class ReportModel extends Database {
 
   String? id;
   String? status;
+  String? reportId;
   String? reporterId;
   String? reporterName;
   GeoPoint? reporterLocation;
+  String? area;
+  String? address;
   String? officerId;
   String? officerName;
   String? reporterDescription;
@@ -41,6 +48,7 @@ class ReportModel extends Database {
   GeoPoint? officerLastLocation;
   String? officerNote;
   int? taskDuration;
+  DateTime? officerLastLocationAt;
   DateTime? createdAt;
   DateTime? assignedAt;
   DateTime? startedAt;
@@ -50,9 +58,12 @@ class ReportModel extends Database {
   ReportModel({
     this.id,
     this.status,
+    this.reportId,
     this.reporterId,
     this.reporterName,
     this.reporterLocation,
+    this.area,
+    this.address,
     this.officerId,
     this.officerName,
     this.reporterDescription,
@@ -60,6 +71,7 @@ class ReportModel extends Database {
     this.officerBeforePhoto,
     this.officerProgressPhoto,
     this.officerLastLocation,
+    this.officerLastLocationAt,
     this.officerNote,
     this.taskDuration,
     this.createdAt,
@@ -80,9 +92,12 @@ class ReportModel extends Database {
       ) {
     var json = doc.data() as Map<String, dynamic>?;
     status = json?[STATUS];
+    reportId = json?[REPORT_ID];
     reporterId = json?[REPORTER_ID];
     reporterName = json?[REPORTER_NAME];
     reporterLocation = json?[REPORTER_LOCATION];
+    area = json?[AREA];
+    address = json?[ADDRESS];
     officerId = json?[OFFICER_ID];
     officerName = json?[OFFICER_NAME];
     reporterDescription = json?[REPORTER_DESCRIPTION];
@@ -92,6 +107,8 @@ class ReportModel extends Database {
       json?[OFFICER_PROGRESS_PHOTO] ?? [],
     );
     officerLastLocation = json?[OFFICER_LAST_LOCATION];
+    officerLastLocationAt =
+        (json?[OFFICER_LAST_LOCATION_AT] as Timestamp?)?.toDate();
     officerNote = json?[OFFICER_NOTE];
     taskDuration = json?[TASK_DURATION];
     createdAt = (json?[CREATED_AT] as Timestamp?)?.toDate();
@@ -105,9 +122,12 @@ class ReportModel extends Database {
     return {
       ID: id,
       STATUS: status,
+      REPORT_ID: reportId,
       REPORTER_ID: reporterId,
       REPORTER_NAME: reporterName,
       REPORTER_LOCATION: reporterLocation,
+      AREA: area,
+      ADDRESS: address,
       OFFICER_ID: officerId,
       OFFICER_NAME: officerName,
       REPORTER_DESCRIPTION: reporterDescription,
@@ -115,6 +135,7 @@ class ReportModel extends Database {
       OFFICER_BEFORE_PHOTO: officerBeforePhoto,
       OFFICER_PROGRESS_PHOTO: officerProgressPhoto,
       OFFICER_LAST_LOCATION: officerLastLocation,
+      OFFICER_LAST_LOCATION_AT: officerLastLocationAt,
       OFFICER_NOTE: officerNote,
       TASK_DURATION: taskDuration,
       CREATED_AT: createdAt,
@@ -126,14 +147,24 @@ class ReportModel extends Database {
   }
 
   Future<ReportModel> save({File? file, bool? isSet}) async {
-    id.isEmptyOrNull
-        ? id = await super.add(toJson())
-        : (isSet ?? false)
-        ? super.collectionReference.doc(id).set(toJson())
-        : await super.edit(toJson());
+    if (id.isEmptyOrNull) {
+      id = await super.add(toJson());
+    } else {
+      (isSet ?? false)
+          ? super.collectionReference.doc(id).set(toJson())
+          : await super.edit(toJson());
+    }
     if (file != null && !id.isEmptyOrNull) {
       reporterPhoto = await super.upload(id: id!, file: file);
       await super.edit(toJson());
+    }
+    // Add Area to Collection
+    if (area != null && area!.isNotEmpty) {
+      final areaPath = firestore.collection('areas').doc(area);
+      final areaDoc = await areaPath.get();
+      if (!areaDoc.exists) {
+        await areaPath.set({'name': area});
+      }
     }
     return this;
   }

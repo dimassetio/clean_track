@@ -18,6 +18,7 @@ class HomeController extends GetxController {
   Stream<List<ReportModel>> _streamReports() {
     return ReportModel().collectionReference
         .where(ReportModel.REPORTER_ID, isEqualTo: authC.user.id)
+        .orderBy(ReportModel.CREATED_AT, descending: true)
         .snapshots()
         .map(
           (stream) =>
